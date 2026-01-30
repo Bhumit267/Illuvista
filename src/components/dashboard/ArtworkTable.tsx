@@ -50,7 +50,7 @@ export default function ArtworkTable({ artworks, role }: ArtworkTableProps) {
                             </td>
                             <td className="px-6 py-4">
                                 <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium 
-                  ${artwork.status === 'AVAILABLE' ? 'bg-green-100 text-green-700' : 'bg-neutral-100 text-neutral-600'}`}>
+                  ${artwork.status === 'PUBLISHED' ? 'bg-green-100 text-green-700' : 'bg-neutral-100 text-neutral-600'}`}>
                                     {artwork.status}
                                 </span>
                             </td>

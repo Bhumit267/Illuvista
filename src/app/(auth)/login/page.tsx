@@ -4,24 +4,57 @@ import { useAuth } from "@/context/AuthContext";
 import { UserRole } from "@/types";
 import { useState } from "react";
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
     const { login, isLoading } = useAuth();
     const [error, setError] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const router = useRouter();
 
-    const handleLogin = async (role: UserRole) => {
+    const handleLogin = async (e?: React.FormEvent, customEmail?: string, customPassword?: string) => {
+        if (e) e.preventDefault();
+        setError('');
+
+        const loginEmail = customEmail || email;
+        const loginPassword = customPassword || password;
+
+        if (!loginEmail || !loginPassword) {
+            setError('Please enter both email and password.');
+            return;
+        }
+
         try {
-            await login(role);
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: loginEmail, password: loginPassword }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                await login(); // Refresh context
+                // Redirect happened in middleware or we can do it here
+                if (data.user.role === 'ADMIN') router.push('/admin');
+                else if (data.user.role === 'ARTIST') router.push('/dashboard');
+                else router.push('/account');
+            } else {
+                setError(data.error || 'Login failed. Please check your credentials.');
+            }
         } catch (err) {
-            setError('Login failed. Please try again.');
+            setError('An error occurred. Please try again later.');
         }
     };
 
-    // Mock handler for form submission
-    const handleFormSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        // Default to Buyer for form login in mock mode
-        handleLogin('BUYER');
+    const handleDemoLogin = (role: 'ADMIN' | 'ARTIST' | 'BUYER') => {
+        let demoEmail = '';
+        if (role === 'ADMIN') demoEmail = 'admin@illuvista.com';
+        else if (role === 'ARTIST') demoEmail = 'elena@art.com';
+        else demoEmail = 'bob@collector.com';
+
+        handleLogin(undefined, demoEmail, 'password123'); // Assuming all demo users have this password
     };
 
     return (
@@ -33,28 +66,35 @@ export default function LoginPage() {
                 </div>
 
                 {/* Standard Form */}
-                <form onSubmit={handleFormSubmit} className="space-y-4 mb-8">
+                <form onSubmit={handleLogin} className="space-y-4 mb-4">
                     <div>
-                        <label className="text-xs uppercase tracking-wider text-muted font-medium mb-1 block">Email Only</label>
+                        <label className="text-xs uppercase tracking-wider text-muted font-medium mb-1 block">Email</label>
                         <input
                             type="email"
-                            placeholder="demo@example.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="your@email.com"
                             className="w-full bg-muted/5 border border-muted/20 rounded-md px-4 py-3 text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+                            required
                         />
                     </div>
                     <div>
                         <label className="text-xs uppercase tracking-wider text-muted font-medium mb-1 block">Password</label>
                         <input
                             type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             placeholder="••••••••"
                             className="w-full bg-muted/5 border border-muted/20 rounded-md px-4 py-3 text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+                            required
                         />
                     </div>
                     <button
                         type="submit"
-                        className="w-full bg-foreground text-background py-3 text-sm uppercase tracking-widest hover:bg-accent hover:text-white transition-all duration-300"
+                        disabled={isLoading}
+                        className="w-full bg-foreground text-background py-3 text-sm uppercase tracking-widest hover:bg-accent hover:text-white transition-all duration-300 disabled:opacity-50"
                     >
-                        Sign In
+                        {isLoading ? 'Signing In...' : 'Sign In'}
                     </button>
                 </form>
 
@@ -70,7 +110,7 @@ export default function LoginPage() {
                 <div className="space-y-3">
                     <button
                         disabled={isLoading}
-                        onClick={() => handleLogin('ARTIST')}
+                        onClick={() => handleDemoLogin('ARTIST')}
                         className="w-full flex items-center justify-between p-3 border border-muted/20 rounded-lg hover:border-accent hover:bg-accent/5 transition-all text-left group"
                     >
                         <div>
@@ -81,7 +121,7 @@ export default function LoginPage() {
 
                     <button
                         disabled={isLoading}
-                        onClick={() => handleLogin('BUYER')}
+                        onClick={() => handleDemoLogin('BUYER')}
                         className="w-full flex items-center justify-between p-3 border border-muted/20 rounded-lg hover:border-accent hover:bg-accent/5 transition-all text-left group"
                     >
                         <div>
@@ -92,7 +132,7 @@ export default function LoginPage() {
 
                     <button
                         disabled={isLoading}
-                        onClick={() => handleLogin('ADMIN')}
+                        onClick={() => handleDemoLogin('ADMIN')}
                         className="w-full flex items-center justify-between p-3 border border-muted/20 rounded-lg hover:border-accent hover:bg-accent/5 transition-all text-left group"
                     >
                         <div>

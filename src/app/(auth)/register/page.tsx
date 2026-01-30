@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { UserRole } from "@/types";
 import Link from 'next/link';
 import { useState } from "react";
+import { useRouter } from 'next/navigation';
 import { Check, User, Palette } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -15,13 +16,33 @@ export default function RegisterPage() {
         email: '',
         password: ''
     });
+    const [error, setError] = useState('');
+    const router = useRouter();
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Simulate registration by logging in as the selected role
-        // In a real app this would POST to an API
-        if (formData.email && formData.password) {
-            await login(role);
+        setError('');
+
+        try {
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...formData, role }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                await login(); // Update context
+                // Redirect based on role
+                if (role === 'ADMIN') router.push('/admin');
+                else if (role === 'ARTIST') router.push('/dashboard');
+                else router.push('/account');
+            } else {
+                setError(data.error || 'Registration failed.');
+            }
+        } catch (err) {
+            setError('An error occurred. Please try again.');
         }
     };
 
@@ -99,10 +120,12 @@ export default function RegisterPage() {
                         </div>
                     </div>
 
+                    {error && <p className="text-red-500 text-xs mt-2 text-center">{error}</p>}
+
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full bg-foreground text-background py-4 text-sm uppercase tracking-widest hover:bg-accent hover:text-white transition-all duration-300 disabled:opacity-50"
+                        className="w-full bg-foreground text-background py-4 text-sm uppercase tracking-widest hover:bg-accent hover:text-white transition-all duration-300 disabled:opacity-50 mt-4"
                     >
                         {isLoading ? 'Creating Account...' : 'Create Account'}
                     </button>

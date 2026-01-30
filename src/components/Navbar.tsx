@@ -5,6 +5,7 @@ import { Search, ShoppingBag, User } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { UserRole } from '@/types';
+import NotificationBell from './notifications/NotificationBell';
 
 export default function Navbar() {
     const { items, toggleCart } = useCart();
@@ -34,6 +35,9 @@ export default function Navbar() {
                     <Link href="/about" className="text-sm font-medium hover:text-accent transition-colors">
                         About
                     </Link>
+                    <Link href="/pricing" className="text-sm font-medium hover:text-accent transition-colors">
+                        Pricing
+                    </Link>
                 </div>
 
                 {/* Actions */}
@@ -41,6 +45,8 @@ export default function Navbar() {
                     <button className="hover:text-accent transition-colors">
                         <Search className="w-5 h-5" />
                     </button>
+
+                    <NotificationBell />
 
                     {user ? (
                         <Link

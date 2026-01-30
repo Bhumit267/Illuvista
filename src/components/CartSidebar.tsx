@@ -1,6 +1,7 @@
 'use client';
 
 import { useCart } from '@/context/CartContext';
+import Link from 'next/link';
 import { X, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -75,9 +76,13 @@ export default function CartSidebar() {
                                 <span>Total</span>
                                 <span>${total.toLocaleString()}</span>
                             </div>
-                            <button className="w-full bg-foreground text-background py-4 text-sm uppercase tracking-widest hover:bg-accent hover:text-white transition-all duration-300">
+                            <Link
+                                href="/checkout"
+                                onClick={toggleCart}
+                                className="w-full bg-foreground text-background py-4 text-sm uppercase tracking-widest hover:bg-accent hover:text-white transition-all duration-300 flex items-center justify-center"
+                            >
                                 Proceed to Checkout
-                            </button>
+                            </Link>
                         </div>
                     </motion.div>
                 </>
