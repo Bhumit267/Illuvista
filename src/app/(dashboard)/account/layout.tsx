@@ -14,16 +14,16 @@ export default function AccountLayout({
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
-    const { user, loading } = useAuth();
+    const { user, isLoading } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
-        if (!loading && !user) {
+        if (!isLoading && !user) {
             router.push('/login');
         }
-    }, [user, loading, router]);
+    }, [user, isLoading, router]);
 
-    if (loading || !user) {
+    if (isLoading || !user) {
         return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
     }
 
