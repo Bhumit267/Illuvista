@@ -12,12 +12,7 @@ export default function Navbar() {
     const itemCount = items.length;
 
     const getDashboardLink = (role: UserRole) => {
-        switch (role) {
-            case 'ARTIST': return '/artist';
-            case 'BUYER': return '/buyer';
-            case 'ADMIN': return '/admin';
-            default: return '/';
-        }
+        return '/dashboard';
     };
 
     return (
