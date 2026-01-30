@@ -7,9 +7,9 @@ export default function DashboardHeader() {
     const { user } = useAuth();
 
     return (
-        <header className="h-20 border-b border-muted/20 bg-background/50 backdrop-blur-sm px-8 flex items-center justify-between sticky top-0 z-30">
+        <header className="h-16 md:h-20 border-b border-muted/20 bg-background/50 backdrop-blur-sm px-4 md:px-8 flex items-center justify-between sticky top-0 z-30 ml-12 md:ml-0">
             <div className="flex items-center gap-4 flex-1">
-                <div className="relative w-full max-w-md hidden md:block">
+                <div className="relative w-full max-w-md hidden lg:block">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
                     <input
                         type="text"
