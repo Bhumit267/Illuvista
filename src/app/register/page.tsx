@@ -1,0 +1,120 @@
+'use client';
+
+import { useAuth } from "@/context/AuthContext";
+import { UserRole } from "@/types";
+import Link from 'next/link';
+import { useState } from "react";
+import { Check, User, Palette } from 'lucide-react';
+import clsx from 'clsx';
+
+export default function RegisterPage() {
+    const { login, isLoading } = useAuth();
+    const [role, setRole] = useState<UserRole>('BUYER');
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: ''
+    });
+
+    const handleRegister = async (e: React.FormEvent) => {
+        e.preventDefault();
+        // Simulate registration by logging in as the selected role
+        // In a real app this would POST to an API
+        if (formData.email && formData.password) {
+            await login(role);
+        }
+    };
+
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-muted/10 px-4 py-12">
+            <div className="bg-background p-8 rounded-xl shadow-xl max-w-md w-full border border-muted/20">
+                <div className="text-center mb-8">
+                    <h1 className="text-3xl font-serif font-bold mb-2">Join IlluVista</h1>
+                    <p className="text-muted text-sm">Create an account to start your journey.</p>
+                </div>
+
+                <form onSubmit={handleRegister} className="space-y-6">
+                    {/* Role Selection */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <button
+                            type="button"
+                            onClick={() => setRole('BUYER')}
+                            className={clsx(
+                                "p-4 border rounded-lg flex flex-col items-center justify-center gap-2 transition-all",
+                                role === 'BUYER'
+                                    ? "border-accent bg-accent/5 text-accent"
+                                    : "border-muted/20 hover:border-muted/50 text-muted hover:text-foreground"
+                            )}
+                        >
+                            <User className="w-6 h-6" />
+                            <span className="text-sm font-medium">Collector</span>
+                            {role === 'BUYER' && <Check className="w-4 h-4 text-accent absolute top-2 right-2" />}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setRole('ARTIST')}
+                            className={clsx(
+                                "p-4 border rounded-lg flex flex-col items-center justify-center gap-2 transition-all",
+                                role === 'ARTIST'
+                                    ? "border-accent bg-accent/5 text-accent"
+                                    : "border-muted/20 hover:border-muted/50 text-muted hover:text-foreground"
+                            )}
+                        >
+                            <Palette className="w-6 h-6" />
+                            <span className="text-sm font-medium">Artist</span>
+                            {role === 'ARTIST' && <Check className="w-4 h-4 text-accent absolute top-2 right-2" />}
+                        </button>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div>
+                            <label className="text-xs uppercase tracking-wider text-muted font-medium mb-1 block">Full Name</label>
+                            <input
+                                type="text"
+                                required
+                                className="w-full bg-muted/5 border border-muted/20 rounded-md px-4 py-3 text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+                                value={formData.name}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            />
+                        </div>
+                        <div>
+                            <label className="text-xs uppercase tracking-wider text-muted font-medium mb-1 block">Email Address</label>
+                            <input
+                                type="email"
+                                required
+                                className="w-full bg-muted/5 border border-muted/20 rounded-md px-4 py-3 text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+                                value={formData.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            />
+                        </div>
+                        <div>
+                            <label className="text-xs uppercase tracking-wider text-muted font-medium mb-1 block">Password</label>
+                            <input
+                                type="password"
+                                required
+                                className="w-full bg-muted/5 border border-muted/20 rounded-md px-4 py-3 text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+                                value={formData.password}
+                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            />
+                        </div>
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={isLoading}
+                        className="w-full bg-foreground text-background py-4 text-sm uppercase tracking-widest hover:bg-accent hover:text-white transition-all duration-300 disabled:opacity-50"
+                    >
+                        {isLoading ? 'Creating Account...' : 'Create Account'}
+                    </button>
+                </form>
+
+                <div className="mt-6 text-center text-sm text-muted">
+                    Already have an account?{' '}
+                    <Link href="/login" className="text-foreground font-medium hover:underline">
+                        Sign In
+                    </Link>
+                </div>
+            </div>
+        </div>
+    );
+}
